@@ -8,6 +8,9 @@ const upload = require('../config/multer'); // Import the multer configuration
 router.use(authenticateJWT);
 
 // Create a new plant with file upload
-router.post('/create', upload.single('image'), plantController.createPlant);
-
+router.post('/add-plant', upload.single('image'), plantController.createPlant);
+router.get('/all', plantController.getAllPlants); // Get all plants for the authenticated user
+router.get('/:plant_id', plantController.getPlantById); // Get a single plant by ID
+router.delete('/:plant_id', plantController.deletePlant); // Delete a plant by ID
+router.put('/:plant_id', upload.single('image'), plantController.editPlant); // Update a plant by ID
 module.exports = router;
