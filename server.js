@@ -18,6 +18,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve s
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/plants', plantRoutes);
+app.use('/api/sensors', require('./routes/sensors')); // Sensor routes
+app.use('/api/actions', require('./routes/actions')); // Action routes
 
 // Health check endpoint
 app.get('/', (req, res) => {
