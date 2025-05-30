@@ -78,3 +78,4 @@ const SensorController = {
 };
 
 module.exports = SensorController;
+// [ ] Build simple JSON mock for fake sensor data (until IoT connects).
