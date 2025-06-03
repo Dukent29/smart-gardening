@@ -19,7 +19,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve s
 app.use('/api/users', userRoutes);
 app.use('/api/plants', plantRoutes);
 app.use('/api/sensors', require('./routes/sensors')); // Sensor routes
-app.use('/api/actions', require('./routes/actions')); // Action routes
+app.use('/api/actions', require('./routes/actions')); // this will handle actions like watering, fertilizing, etc.
 
 // Health check endpoint
 app.get('/', (req, res) => {

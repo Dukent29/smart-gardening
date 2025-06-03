@@ -1,5 +1,8 @@
 const bcrypt = require('bcryptjs');
-const db = require('../config/pg'); // Ensure this path is correct and the db module is properly configured
+const db = require('../config/pg');// Ensure this path is correct and the db module is properly configured
+const crypto = require('crypto'); // Add at the top if not already
+
+
 
 const User = {
   // Fetch all users
@@ -9,6 +12,46 @@ const User = {
     const result = await db.query(query);
     return result.rows; // Access the rows property
   },
+  setResetToken: async (email, token, expiry) => {
+    const query = `
+    UPDATE users
+    SET reset_token = $1, reset_token_expiry = $2
+    WHERE email = $3
+  `;
+    const values = [token, expiry, email];
+    console.log('[DEBUG] Executing setResetToken query:', query, 'with values:', values);
+    const result = await db.query(query, values);
+    return result.rowCount > 0;
+  },
+  // Find user by reset token
+  findByResetToken: async (token) => {
+    const query = `SELECT * FROM users WHERE reset_token = $1`;
+    const values = [token];
+    const result = await db.query(query, values);
+    return result.rows[0];
+  },
+
+// Update password and clear reset fields
+  updatePasswordByEmail: async (email, hashedPassword) => {
+    const query = `
+      UPDATE users
+      SET password_hash = $1, reset_token = NULL, reset_token_expiry = NULL
+      WHERE email = $2
+    `;
+    const values = [hashedPassword, email];
+    await db.query(query, values);
+  },
+
+
+  clearResetToken: async (email) => {
+    const query = `
+    UPDATE users
+    SET reset_token = NULL, reset_token_expiry = NULL
+    WHERE email = $1
+  `;
+    await db.query(query, [email]);
+  },
+
 
   // Fetch a user by ID
   findById: async (userId) => {
@@ -117,7 +160,32 @@ const User = {
     console.log('[DEBUG] Executing activateAccount query:', query, 'with values:', values);
     const result = await db.query(query, values);
     return result.rowCount > 0; // Return true if the update was successful
-  }
+  },
+    // Update user profile
+  update: async (userId, { username, email }) => {
+    const query = `
+    UPDATE users
+    SET 
+      username = COALESCE($1, username),
+      email = COALESCE($2, email),
+      updated_at = NOW()
+    WHERE user_id = $3
+    RETURNING user_id, username, email, role, created_at
+  `;
+    const values = [username || null, email || null, userId];
+
+    console.log('[DEBUG] Executing update query:', query, 'with values:', values);
+    const result = await db.query(query, values);
+
+    if (result.rows.length === 0) {
+      throw new Error('Update failed');
+    }
+
+    return result.rows[0];
+  },
+    // Forgot password - generate a reset token
+
 };
+
 
 module.exports = User;
