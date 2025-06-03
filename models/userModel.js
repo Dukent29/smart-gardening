@@ -117,7 +117,30 @@ const User = {
     console.log('[DEBUG] Executing activateAccount query:', query, 'with values:', values);
     const result = await db.query(query, values);
     return result.rowCount > 0; // Return true if the update was successful
+  },
+    // Update user profile
+  update: async (userId, { username, email }) => {
+    const query = `
+    UPDATE users
+    SET 
+      username = COALESCE($1, username),
+      email = COALESCE($2, email),
+      updated_at = NOW()
+    WHERE user_id = $3
+    RETURNING user_id, username, email, role, created_at
+  `;
+    const values = [username || null, email || null, userId];
+
+    console.log('[DEBUG] Executing update query:', query, 'with values:', values);
+    const result = await db.query(query, values);
+
+    if (result.rows.length === 0) {
+      throw new Error('Update failed');
+    }
+
+    return result.rows[0];
   }
 };
+
 
 module.exports = User;

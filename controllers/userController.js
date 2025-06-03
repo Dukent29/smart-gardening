@@ -104,9 +104,31 @@ const login = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+const updateProfile = async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const user_id = req.user?.userId;// Vérifiez si user_id est défini
+
+    if (!user_id) {
+      return res.status(400).json({ success: false, message: 'Invalid user_id' });
+    }
+
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+    }
+
+    const updatedUser = await User.update(user_id, { username, email });
+    res.status(200).json({ success: true, message: 'Profil mis à jour avec succès', user: updatedUser });
+  } catch (error) {
+    console.error('[ERROR] Erreur lors de la mise à jour du profil :', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   register,
   confirmEmail,
   login,
+  updateProfile
 };
