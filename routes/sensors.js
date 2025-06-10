@@ -20,32 +20,43 @@ router.post('/mock/:plantId', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Invalid plant ID' });
     }
 
+    // Génération des données mock
     const mockData = {
-        plant_id: plantId,
-        temperature: parseFloat((Math.random() * 10 + 20).toFixed(1)),
-        humidity: parseFloat((Math.random() * 20 + 40).toFixed(1)),
-        soilMoisture: parseFloat((Math.random() * 30 + 20).toFixed(1)),
-        light: Math.floor(Math.random() * 1000),
+        temperature: parseFloat((Math.random() * 10 + 20).toFixed(1)),    // 20 à 30°C
+        humidity: parseFloat((Math.random() * 20 + 40).toFixed(1)),       // 40 à 60%
+        soilMoisture: parseFloat((Math.random() * 30 + 20).toFixed(1)),   // 20 à 50%
+        light: Math.floor(Math.random() * 1000),                          // 0 à 1000 lux
         timestamp: new Date()
     };
 
-    // INSERT dans la table sensors
-    try {
-        await db.query(
-            `INSERT INTO sensors (plant_id, sensor_type, value, status, timestamp)
-             VALUES
-                 ($1, $2, $3, 'OK', $7),
-                 ($1, $4, $5, 'OK', $7),
-                 ($1, $6, $8, 'OK', $7)`,
-            [
-                plantId,
-                sensorTypes.temperature, mockData.temperature,
-                sensorTypes.humidity, mockData.humidity,
-                sensorTypes.soilMoisture, mockData.timestamp,
-                mockData.soilMoisture
-            ]
-        );
+    // Tableau dynamique des capteurs à insérer
+    const sensorValues = [
+        { type: sensorTypes.temperature, value: mockData.temperature },
+        { type: sensorTypes.humidity, value: mockData.humidity },
+        { type: sensorTypes.soilMoisture, value: mockData.soilMoisture },
+        { type: sensorTypes.light, value: mockData.light }
+    ];
 
+    // Construction dynamique des valeurs pour la requête SQL
+    const insertValues = [];
+    const params = [plantId]; // $1 = plantId
+    let paramIndex = 2; // commence à $2 car $1 est déjà pris
+
+    for (const sensor of sensorValues) {
+        // Ajoute une ligne à VALUES genre: ($1, $2, $3, 'OK', $4)
+        insertValues.push(`($1, $${paramIndex++}, $${paramIndex++}, 'OK', $${paramIndex++})`);
+        // Ajoute les vraies valeurs dans l’ordre
+        params.push(sensor.type, sensor.value, mockData.timestamp);
+    }
+
+    // Requête SQL finale
+    const query = `
+    INSERT INTO sensors (plant_id, sensor_type, value, status, timestamp)
+    VALUES ${insertValues.join(', ')}
+  `;
+
+    try {
+        await db.query(query, params);
         res.json({ success: true, data: mockData });
     } catch (err) {
         console.error('[ERROR] Inserting mock sensor data:', err);
