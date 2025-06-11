@@ -1,81 +1,114 @@
-const SensorData = require('../models/sensorModel');
-const PlantAction = require('../models/actionModel');
-const Plant = require('../models/plantModel'); // Assuming the path to plantModel is correct
-const Sensor = require('../models/sensorModel'); // Assuming the path to sensorModel is correct
+const Plant = require('../models/plantModel');
+const Sensor = require('../models/sensorModel');
+const Action = require('../models/actionModel');
 
+const thresholds = {
+    temperature: { low: 18, high: 30 },
+    humidity: { low: 40, high: 70 },
+    soil_moisture: { low: 25, high: 60 },
+    light: { low: 200, high: 800 }
+};
 
+function getStatus(type, value) {
+    const t = thresholds[type];
+    if (!t) return 'OK';
+    if (value < t.low) return 'LOW';
+    if (value > t.high) return 'CRITICAL';
+    return 'OK';
+}
+
+// la fonction d’action
+function getActionText(sensor_type, status, value) {
+    if (sensor_type === 'soil_moisture') {
+        if (status === 'LOW') return `💧 Auto-watering triggered: soil moisture is LOW (${value}%)`;
+        if (status === 'CRITICAL') return `🚨 CRITICAL soil moisture (${value}%) – Watering + Alert sent`;
+    }
+
+    if (sensor_type === 'humidity') {
+        if (status === 'LOW') return `💨 Activated air humidifier: humidity is LOW (${value}%)`;
+        if (status === 'CRITICAL') return `🚨 Humidity CRITICALLY LOW (${value}%) – Alert sent to user`;
+    }
+
+    if (sensor_type === 'light') {
+        if (status === 'LOW') return `💡 Grow light activated: light level LOW (${value} lux)`;
+        if (status === 'CRITICAL') return `🚨 Light level CRITICAL (${value} lux) – Lighting + Alert`;
+    }
+
+    if (sensor_type === 'temperature') {
+        if (status === 'LOW') return `🔥 Heating system triggered: temperature LOW (${value}°C)`;
+        if (status === 'CRITICAL') return `🚨 Temperature CRITICAL (${value}°C) – Extreme condition`;
+    }
+
+    return ` Sensor ${sensor_type} is ${status} (${value})`;
+}
 
 const SensorController = {
-    getSensorDataByPlant: async (req, res) => {
-        try {
-            const user_id = req.user.userId;
-            const { plant_id } = req.params;
-
-            // First, check if the plant belongs to the user
-            const plant = await Plant.getById(plant_id, user_id);
-            if (!plant) {
-                return res.status(403).json({ success: false, message: 'Access denied: Plant not found or not yours.' });
-            }
-
-            // Now fetch the sensor data for this plant
-            const sensorData = await Sensor.getByPlantId(plant_id);
-            res.status(200).json({ success: true, data: sensorData });
-        } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
-        }
-    },
-
-    automatePlantCare: async (req, res) => {
+    simulateAndAutomate: async (req, res) => {
         const user_id = req.user.userId;
-        const { plant_id } = req.params;
+        const plant_id = parseInt(req.params.plant_id);
 
         try {
-            // Check if the plant belongs to the user
             const plant = await Plant.getById(plant_id, user_id);
             if (!plant) {
-                return res.status(403).json({ success: false, message: 'Access denied: Plant not found or not yours.' });
+                return res.status(403).json({
+                    success: false,
+                    message: 'Access denied: Plant not found or not yours.'
+                });
             }
 
-            const sensorData = {
-                soilMoisture: Math.random() * 100,
-                lightLevel: Math.random() * 100,
-            };
+            const sensorTypes = await Sensor
+                .find({ plant_id })
+                .distinct('sensor_type');
 
-            let triggeredActions = [];
+            const triggeredActions = [];
+            const processedSensors = [];
 
-            if (sensorData.soilMoisture < 30) {
-                await PlantAction.create({
-                    plant_id,
-                    action: 'Auto-watering triggered due to dry soil.',
-                    action_type: 'auto',
-                    timestamp: new Date(),
+            for (const type of sensorTypes) {
+                const sensor = await Sensor
+                    .findOne({ plant_id, sensor_type: type })
+                    .sort({ timestamp: -1 });
+
+                if (!sensor) continue;
+
+                console.log(`[DEBUG] Type: ${type} | Value: ${sensor.value} | Timestamp: ${sensor.timestamp}`);
+
+                const status = getStatus(type, sensor.value);
+
+                processedSensors.push({
+                    type,
+                    value: sensor.value,
+                    status
                 });
-                triggeredActions.push('Watered due to dry soil');
-            }
 
-            if (sensorData.lightLevel < 20) {
-                await PlantAction.create({
-                    plant_id,
-                    action: 'Auto-adjusted lighting due to low light.',
-                    action_type: 'auto',
-                    timestamp: new Date(),
-                });
-                triggeredActions.push('Adjusted lighting');
+                if (status !== 'OK') {
+                    const actionText = getActionText(type, status, sensor.value); // ✅ on l'utilise ici
+
+                    await Action.create({
+                        plant_id,
+                        sensor_type: type,
+                        value: sensor.value,
+                        status,
+                        action: actionText,
+                        action_type: 'auto',
+                        timestamp: new Date()
+                    });
+
+                    triggeredActions.push(actionText);
+                }
             }
 
             res.status(200).json({
                 success: true,
-                message: 'Automation check complete',
-                sensorData,
-                triggeredActions,
+                message: 'Simulation & automation complete',
+                sensors: processedSensors,
+                triggeredActions
             });
 
         } catch (error) {
-            console.error(error);
+            console.error('[simulate] ERROR:', error);
             res.status(500).json({ success: false, message: error.message });
         }
     }
 };
 
 module.exports = SensorController;
-// [ ] Build simple JSON mock for fake sensor data (until IoT connects).
