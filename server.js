@@ -4,6 +4,10 @@ const dotenv = require('dotenv');
 const path = require('path');
 const userRoutes = require('./routes/users');
 const plantRoutes = require('./routes/plants');
+const sensorRoutes = require('./routes/sensors');
+const actionRoutes = require('./routes/actions');
+const mockRoutes = require('./routes/mock');
+
 const connectMongoDB = require('./config/mongo');
 
 dotenv.config();
@@ -19,8 +23,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve s
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/plants', plantRoutes);
-app.use('/api/sensors', require('./routes/sensors')); // Sensor routes
-app.use('/api/actions', require('./routes/actions')); // this will handle actions like watering, fertilizing, etc.
+app.use('/api/sensors', sensorRoutes);
+app.use('/api/actions', actionRoutes);
+app.use('/api/mock', mockRoutes);
+
 
 connectMongoDB();
 // Health check endpoint
