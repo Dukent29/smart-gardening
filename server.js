@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const userRoutes = require('./routes/users');
 const plantRoutes = require('./routes/plants');
+const connectMongoDB = require('./config/mongo');
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use('/api/plants', plantRoutes);
 app.use('/api/sensors', require('./routes/sensors')); // Sensor routes
 app.use('/api/actions', require('./routes/actions')); // this will handle actions like watering, fertilizing, etc.
 
+connectMongoDB();
 // Health check endpoint
 app.get('/', (req, res) => {
     res.send('Smart Gardening Backend is running!');
