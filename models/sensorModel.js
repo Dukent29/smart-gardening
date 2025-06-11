@@ -1,24 +1,11 @@
 const db = require('../config/pg');
-const mongoose = require('mongoose');
 
-const sensorSchema = new mongoose.Schema({
-    plant_id: {
-        type: mongoose.Schema.Types.Mixed, // ID SQL de la plante
-        required: true
-    },
-    sensor_type: {
-        type: String,
-        enum: ['temperature', 'humidity', 'light', 'soil_moisture'],
-        required: true
-    },
-    value: {
-        type: Number,
-        required: true
-    },
-    timestamp: {
-        type: Date,
-        default: Date.now
+const SensorData = {
+    getByPlantId: async (plant_id) => {
+        const query = 'SELECT * FROM sensors WHERE plant_id = $1 ORDER BY timestamp DESC';
+        const result = await db.query(query, [plant_id]);
+        return result.rows;
     }
-});
+};
 
-module.exports = mongoose.model('Sensor', sensorSchema);
+module.exports = SensorData;
