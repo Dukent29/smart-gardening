@@ -106,6 +106,7 @@ const login = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// Update user profile
 const updateProfile = async (req, res) => {
   try {
     const { username, email } = req.body;

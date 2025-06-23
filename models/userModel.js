@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
-const db = require('../config/pg');// Ensure this path is correct and the db module is properly configured
-const crypto = require('crypto'); // Add at the top if not already
+const db = require('../config/pg');
+const crypto = require('crypto');
 
 
 
@@ -62,7 +62,7 @@ const User = {
     const values = [userId];
     console.log('[DEBUG] Executing findById query:', query, 'with values:', values);
     const result = await db.query(query, values);
-    return result.rows[0]; // Access the first row
+    return result.rows[0];
   },
 
   // Fetch a user by email
