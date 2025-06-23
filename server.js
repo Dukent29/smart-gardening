@@ -7,6 +7,7 @@ const plantRoutes = require('./routes/plants');
 const sensorRoutes = require('./routes/sensors');
 const actionRoutes = require('./routes/actions');
 const mockRoutes = require('./routes/mock');
+const articleRoutes = require('./routes/articles');
 
 const connectMongoDB = require('./config/mongo');
 
@@ -26,6 +27,7 @@ app.use('/api/plants', plantRoutes);
 app.use('/api/sensors', sensorRoutes);
 app.use('/api/actions', actionRoutes);
 app.use('/api/mock', mockRoutes);
+app.use('/api/articles', articleRoutes);
 
 
 connectMongoDB();
