@@ -44,71 +44,75 @@ function getActionText(sensor_type, status, value) {
 
 const SensorController = {
     simulateAndAutomate: async (req, res) => {
-        const user_id = req.user.userId;
-        const plant_id = parseInt(req.params.plant_id);
+    const user_id = req.user.userId;
+    const plant_id = parseInt(req.params.plant_id);
 
-        try {
-            const plant = await Plant.getById(plant_id, user_id);
-            if (!plant) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Access denied: Plant not found or not yours.'
-                });
-            }
+    try {
+        const plant = await Plant.getById(plant_id, user_id);
+        if (!plant) {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied: Plant not found or not yours.'
+            });
+        }
 
-            const sensorTypes = await Sensor
-                .find({ plant_id })
-                .distinct('sensor_type');
+        const sensorTypes = await Sensor
+            .find({ plant_id })
+            .distinct('sensor_type');
 
-            const triggeredActions = [];
-            const processedSensors = [];
+        const triggeredActions = [];
+        const processedSensors = [];
 
-            for (const type of sensorTypes) {
-                const sensor = await Sensor
-                    .findOne({ plant_id, sensor_type: type })
-                    .sort({ timestamp: -1 });
+        for (const type of sensorTypes) {
+            const sensor = await Sensor
+                .findOne({ plant_id, sensor_type: type })
+                .sort({ timestamp: -1 });
 
-                if (!sensor) continue;
+            if (!sensor) continue;
 
-                console.log(`[DEBUG] Type: ${type} | Value: ${sensor.value} | Timestamp: ${sensor.timestamp}`);
+            console.log(`[DEBUG] Type: ${type} | Value: ${sensor.value} | Timestamp: ${sensor.timestamp}`);
 
-                const status = getStatus(type, sensor.value);
+            const status = getStatus(type, sensor.value);
 
-                processedSensors.push({
-                    type,
-                    value: sensor.value,
-                    status
-                });
-
-                if (status !== 'OK') {
-                    const actionText = getActionText(type, status, sensor.value); // ✅ on l'utilise ici
-
-                    await Action.create({
-                        plant_id,
-                        sensor_type: type,
-                        value: sensor.value,
-                        status,
-                        action: actionText,
-                        action_type: 'auto',
-                        timestamp: new Date()
-                    });
-
-                    triggeredActions.push(actionText);
-                }
-            }
-
-            res.status(200).json({
-                success: true,
-                message: 'Simulation & automation complete',
-                sensors: processedSensors,
-                triggeredActions
+            processedSensors.push({
+                type,
+                value: sensor.value,
+                status
             });
 
-        } catch (error) {
-            console.error('[simulate] ERROR:', error);
-            res.status(500).json({ success: false, message: error.message });
+            // ✅ S'il est automatique, on agit
+            if (status !== 'OK' && plant.is_automatic) {
+                const actionText = getActionText(type, status, sensor.value);
+
+                await Action.create({
+                    plant_id,
+                    sensor_type: type,
+                    value: sensor.value,
+                    status,
+                    action: actionText,
+                    action_type: 'auto',
+                    timestamp: new Date()
+                });
+
+                triggeredActions.push(actionText);
+            }
         }
+
+        res.status(200).json({
+            success: true,
+            message: plant.is_automatic
+                ? 'Simulation & automation complete (AUTO mode)'
+                : 'Simulation complete (MANUAL mode – no actions triggered)',
+            sensors: processedSensors,
+            triggeredActions
+        });
+
+    } catch (error) {
+        console.error('[simulate] ERROR:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
+}
+
 };
 
 module.exports = SensorController;

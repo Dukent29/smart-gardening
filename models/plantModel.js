@@ -28,14 +28,26 @@ const Plant = {
     },
     // get single plant 
     getById: async (plant_id, user_id) => {
-        if (!plant_id || !user_id) {
-            throw new Error('Invalid plantId or userId');
-        }
-        const query = 'SELECT * FROM plants WHERE plant_id = $1 AND user_id = $2';
-        const values = [plant_id, user_id];
-        const result = await db.query(query, values);
-        return result.rows[0];
+    if (!plant_id || !user_id) {
+        throw new Error('Invalid plantId or userId');
+    }
+
+    const query = `
+        SELECT plant_id, plant_name, user_id, is_automatic
+        FROM plants
+        WHERE plant_id = $1 AND user_id = $2
+    `;
+    const values = [plant_id, user_id];
+    const result = await db.query(query, values);
+    return result.rows[0];
     },
+
+    updateAutomation: async (plant_id, is_automatic) => {
+    const query = 'UPDATE plants SET is_automatic = $1 WHERE plant_id = $2';
+    const values = [is_automatic, plant_id];
+    await db.query(query, values);
+    },
+
     delete: async (plant_id, user_id) => {
         if (!plant_id || !user_id) {
             throw new Error('Invalid plantId or userId');
