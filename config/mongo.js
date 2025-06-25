@@ -6,9 +6,9 @@ const connectMongoDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        console.log('✅ MongoDB connected to smart_garden');
+        console.log(' MongoDB connected to smart_garden');
     } catch (error) {
-        console.error('❌ MongoDB connection failed:', error.message);
+        console.error(' MongoDB connection failed:', error.message);
     }
 };
 

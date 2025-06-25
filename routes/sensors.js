@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateJWT } = require('../middleware/auth');
-const SensorController = require('../controllers/SensorController');
+const SensorController = require('../controllers/sensorController');
 const Sensor = require('../models/sensorModel'); // Import du modèle Sensor
 
 router.get('/simulate/:plant_id', authenticateJWT, SensorController.simulateAndAutomate);

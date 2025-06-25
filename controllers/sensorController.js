@@ -20,23 +20,23 @@ function getStatus(type, value) {
 // la fonction d’action
 function getActionText(sensor_type, status, value) {
     if (sensor_type === 'soil_moisture') {
-        if (status === 'LOW') return `💧 Auto-watering triggered: soil moisture is LOW (${value}%)`;
-        if (status === 'CRITICAL') return `🚨 CRITICAL soil moisture (${value}%) – Watering + Alert sent`;
+        if (status === 'LOW') return ` Auto-watering triggered: soil moisture is LOW (${value}%)`;
+        if (status === 'CRITICAL') return ` CRITICAL soil moisture (${value}%) – Watering + Alert sent`;
     }
 
     if (sensor_type === 'humidity') {
-        if (status === 'LOW') return `💨 Activated air humidifier: humidity is LOW (${value}%)`;
-        if (status === 'CRITICAL') return `🚨 Humidity CRITICALLY LOW (${value}%) – Alert sent to user`;
+        if (status === 'LOW') return ` Activated air humidifier: humidity is LOW (${value}%)`;
+        if (status === 'CRITICAL') return ` Humidity CRITICALLY LOW (${value}%) – Alert sent to user`;
     }
 
     if (sensor_type === 'light') {
-        if (status === 'LOW') return `💡 Grow light activated: light level LOW (${value} lux)`;
-        if (status === 'CRITICAL') return `🚨 Light level CRITICAL (${value} lux) – Lighting + Alert`;
+        if (status === 'LOW') return ` Grow light activated: light level LOW (${value} lux)`;
+        if (status === 'CRITICAL') return ` Light level CRITICAL (${value} lux) – Lighting + Alert`;
     }
 
     if (sensor_type === 'temperature') {
-        if (status === 'LOW') return `🔥 Heating system triggered: temperature LOW (${value}°C)`;
-        if (status === 'CRITICAL') return `🚨 Temperature CRITICAL (${value}°C) – Extreme condition`;
+        if (status === 'LOW') return ` Heating system triggered: temperature LOW (${value}°C)`;
+        if (status === 'CRITICAL') return ` Temperature CRITICAL (${value}°C) – Extreme condition`;
     }
 
     return ` Sensor ${sensor_type} is ${status} (${value})`;
@@ -80,7 +80,7 @@ const SensorController = {
                 status
             });
 
-            // ✅ S'il est automatique, on agit
+            //  S'il est automatique, on agit
             if (status !== 'OK' && plant.is_automatic) {
                 const actionText = getActionText(type, status, sensor.value);
 

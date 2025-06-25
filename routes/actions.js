@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Action = require('../models/actionModel');
 
-// ✅ test insertion action
+//  test insertion action
 router.get('/test', async (req, res) => {
     try {
         const test = new Action({
