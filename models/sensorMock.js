@@ -6,6 +6,7 @@ const thresholds = {
     light: { low: 200, high: 800 }
 };
 
+
 const sensorTypes = ['temperature', 'humidity', 'soil_moisture', 'light'];
 
 function generateRandomValue(min, max) {
@@ -20,20 +21,24 @@ function getStatus(type, value) {
     return 'OK';
 }
 
-function generateMockSensors(plant_id) {
-    const timestamp = new Date();
-    return sensorTypes.map(type => {
-        const value = generateRandomValue(thresholds[type].low - 5, thresholds[type].high + 5);
-        const status = getStatus(type, value);
-        return {
-            plant_id,
-            sensor_type: type,
-            value,
-            status,
-            timestamp
-        };
-    });
+function generateMockSensors(plant_id, critical = false) {
+    if (critical) {
+        return [
+            { plant_id, sensor_type: 'temperature', value: 10, timestamp: new Date() },      // CRITICAL
+            { plant_id, sensor_type: 'humidity', value: 20, timestamp: new Date() },         // LOW
+            { plant_id, sensor_type: 'soil_moisture', value: 15, timestamp: new Date() },    // LOW
+            { plant_id, sensor_type: 'light', value: 100, timestamp: new Date() }            // LOW
+        ];
+    } else {
+        return [
+            { plant_id, sensor_type: 'temperature', value: parseFloat((Math.random() * 10 + 20).toFixed(1)), status: getStatus('temperature', parseFloat((Math.random() * 10 + 20).toFixed(1))) },
+            { plant_id, sensor_type: 'humidity', value: parseFloat((Math.random() * 30 + 35).toFixed(1)), status: getStatus('humidity', parseFloat((Math.random() * 30 + 35).toFixed(1))) },
+            { plant_id, sensor_type: 'soil_moisture', value: parseFloat((Math.random() * 40 + 20).toFixed(1)), status: getStatus('soil_moisture', parseFloat((Math.random() * 40 + 20).toFixed(1))) },
+            { plant_id, sensor_type: 'light', value: Math.floor(Math.random() * 1000), status: getStatus('light', Math.floor(Math.random() * 1000)) }
+        ].map(obj => ({ ...obj, timestamp: new Date() }));
+    }
 }
+
 
 module.exports = {
     generateMockSensors
