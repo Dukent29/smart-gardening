@@ -4,7 +4,7 @@ const { authenticateJWT } = require('../middleware/auth');
 const SensorController = require('../controllers/sensorController');
 const Sensor = require('../models/sensorModel'); // Import du modèle Sensor
 
-router.get('/simulate/:plant_id', authenticateJWT, SensorController.simulateAndAutomate);
+
 router.post('/force-test/:plant_id', async (req, res) => {
     const { plant_id } = req.params;
     const testSensors = [
@@ -17,6 +17,7 @@ router.post('/force-test/:plant_id', async (req, res) => {
     await Sensor.insertMany(testSensors);
     res.json({ success: true, inserted: testSensors });
 });
+router.get('/simulate/:plant_id', authenticateJWT, SensorController.simulateAndAutomate);
 
 
 module.exports = router;
