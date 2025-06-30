@@ -1,11 +1,9 @@
-// models/sensorMock.js
 const thresholds = {
     temperature: { low: 18, high: 30 },
     humidity: { low: 40, high: 70 },
     soil_moisture: { low: 25, high: 60 },
     light: { low: 200, high: 800 }
 };
-
 
 const sensorTypes = ['temperature', 'humidity', 'soil_moisture', 'light'];
 
@@ -24,21 +22,25 @@ function getStatus(type, value) {
 function generateMockSensors(plant_id, critical = false) {
     if (critical) {
         return [
-            { plant_id, sensor_type: 'temperature', value: 10, timestamp: new Date() },      // CRITICAL
-            { plant_id, sensor_type: 'humidity', value: 20, timestamp: new Date() },         // LOW
-            { plant_id, sensor_type: 'soil_moisture', value: 15, timestamp: new Date() },    // LOW
-            { plant_id, sensor_type: 'light', value: 100, timestamp: new Date() }            // LOW
+            { plant_id, sensor_type: 'temperature', value: 10, status: getStatus('temperature', 10), timestamp: new Date() },
+            { plant_id, sensor_type: 'humidity', value: 20, status: getStatus('humidity', 20), timestamp: new Date() },
+            { plant_id, sensor_type: 'soil_moisture', value: 15, status: getStatus('soil_moisture', 15), timestamp: new Date() },
+            { plant_id, sensor_type: 'light', value: 100, status: getStatus('light', 100), timestamp: new Date() }
         ];
     } else {
-        return [
-            { plant_id, sensor_type: 'temperature', value: parseFloat((Math.random() * 10 + 20).toFixed(1)), status: getStatus('temperature', parseFloat((Math.random() * 10 + 20).toFixed(1))) },
-            { plant_id, sensor_type: 'humidity', value: parseFloat((Math.random() * 30 + 35).toFixed(1)), status: getStatus('humidity', parseFloat((Math.random() * 30 + 35).toFixed(1))) },
-            { plant_id, sensor_type: 'soil_moisture', value: parseFloat((Math.random() * 40 + 20).toFixed(1)), status: getStatus('soil_moisture', parseFloat((Math.random() * 40 + 20).toFixed(1))) },
-            { plant_id, sensor_type: 'light', value: Math.floor(Math.random() * 1000), status: getStatus('light', Math.floor(Math.random() * 1000)) }
-        ].map(obj => ({ ...obj, timestamp: new Date() }));
+        return sensorTypes.map(type => {
+            const t = thresholds[type];
+            const value = generateRandomValue(t.low - 5, t.high + 5); // valeur un peu en dehors exprès
+            return {
+                plant_id,
+                sensor_type: type,
+                value,
+                status: getStatus(type, value),
+                timestamp: new Date()
+            };
+        });
     }
 }
-
 
 module.exports = {
     generateMockSensors

@@ -8,6 +8,8 @@ const sensorRoutes = require('./routes/sensors');
 const actionRoutes = require('./routes/actions');
 const mockRoutes = require('./routes/mock');
 const articleRoutes = require('./routes/articles');
+const simulationRoutes = require('./routes/simulation')
+const simulateEffectRoutes = require('./routes/simulateEffect');
 
 const connectMongoDB = require('./config/mongo');
 
@@ -28,6 +30,10 @@ app.use('/api/sensors', sensorRoutes);
 app.use('/api/actions', actionRoutes);
 app.use('/api/mock', mockRoutes);
 app.use('/api/articles', articleRoutes);
+app.use('/api/simulate', simulateEffectRoutes);
+app.use('/api/simulation', simulationRoutes);
+
+
 
 
 connectMongoDB();
