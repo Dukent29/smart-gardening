@@ -26,6 +26,13 @@ const Plant = {
         const result = await db.query(query, values);
         return result.rows;
     },
+    //get all plant 
+    getAllPlants: async () => {
+    const query = 'SELECT * FROM plants';
+    const result = await db.query(query);
+    return result.rows;
+},
+
     // get single plant 
     getById: async (plant_id, user_id) => {
     if (!plant_id || !user_id) {

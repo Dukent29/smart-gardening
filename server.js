@@ -10,6 +10,7 @@ const mockRoutes = require('./routes/mock');
 const articleRoutes = require('./routes/articles');
 const simulationRoutes = require('./routes/simulation')
 const simulateEffectRoutes = require('./routes/simulateEffect');
+const simulateLoop  = require('./services/simulateLoop'); // Import the simulation loop service
 
 const connectMongoDB = require('./config/mongo');
 
@@ -46,4 +47,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+// Start the sensor simulation loop
+simulateLoop();
 // [ ] Build simple JSON mock for fake sensor data (until IoT connects).
