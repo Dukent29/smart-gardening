@@ -3,7 +3,7 @@ const Sensor = require('../models/sensorModel');
 const {generateMockSensors} = require('../models/sensorMock');
 const Plant  = require('../models/plantModel'); // to retrives plant from postgres
 
-const INTERVAL_MS = 10 * 1000; // 10 seconds
+const INTERVAL_MS = 30 * 1000; // 10 seconds
 
 async function simulateLoop () {
     console.log('🔄 Starting sensor simulation loop...');

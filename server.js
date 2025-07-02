@@ -10,8 +10,8 @@ const mockRoutes = require('./routes/mock');
 const articleRoutes = require('./routes/articles');
 const simulationRoutes = require('./routes/simulation')
 const simulateEffectRoutes = require('./routes/simulateEffect');
-const simulateLoop  = require('./services/simulateLoop'); // Import the simulation loop service
-
+//const simulateLoop = require('./services/simulateLoop'); // Import the simulation loop service
+const plantSensorsRoute = require('./routes/plantSensors');
 const connectMongoDB = require('./config/mongo');
 
 dotenv.config();
@@ -33,6 +33,7 @@ app.use('/api/mock', mockRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/simulate', simulateEffectRoutes);
 app.use('/api/simulation', simulationRoutes);
+app.use('/api', plantSensorsRoute);
 
 
 
@@ -48,5 +49,5 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 // Start the sensor simulation loop
-simulateLoop();
+//simulateLoop();
 // [ ] Build simple JSON mock for fake sensor data (until IoT connects).
