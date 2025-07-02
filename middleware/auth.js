@@ -12,11 +12,11 @@ exports.authenticateJWT = (req, res, next) => {
     try {
         const decoded = JWT.verify(token, process.env.JWT_SECRET);
         req.user = decoded; // Add the userId and other info from token
-
+        console.log('[DEBUG] Decoded JWT:', decoded);
 
         next();
     } catch (error) {
-
+        console.error('JWT verification error:', error);
         res.status(401).json({ success: false, message: 'Invalid token' });
     }
 };
