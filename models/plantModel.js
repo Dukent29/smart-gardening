@@ -40,7 +40,7 @@ const Plant = {
     }
 
     const query = `
-        SELECT plant_id, plant_name, user_id, is_automatic
+        SELECT plant_id, plant_name, plant_type, user_id, is_automatic, description, image_url
         FROM plants
         WHERE plant_id = $1 AND user_id = $2
     `;

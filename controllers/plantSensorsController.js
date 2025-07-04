@@ -1,6 +1,8 @@
 // ✅ controllers/plantSensorsController.js
 const Plant = require('../models/plantModel');
 const Sensor = require('../models/sensorModel');
+const Action = require('../models/actionModel');
+
 
 // Définition des seuils par capteur
 const thresholds = {
@@ -24,6 +26,15 @@ const plantSensorsController = {
     getPlantsWithSensors: async (req, res) => {
         const user_id = req.user.userId;
 
+        const sensorPivot = {
+            cactus: "soil_moisture",
+            succulent: "soil_moisture",
+            orchid: "humidity",
+            mint: "temperature",
+            basil: "light",
+            default: "soil_moisture",
+        };
+
         try {
             const plants = await Plant.getAllByUser(user_id); // PostgreSQL
             const enrichedPlants = [];
@@ -41,9 +52,15 @@ const plantSensorsController = {
                     timestamp: sensor.timestamp
                 }));
 
+                const lastAction = await Action.findOne({ plant_id })
+                    .sort({ timestamp: -1 })           // la plus récente
+                    .select("timestamp");
+
                 enrichedPlants.push({
                     ...plant,
-                    sensors: sensorsWithStatus
+                    main_sensor: sensorPivot[plant.plant_type?.toLowerCase()] || sensorPivot.default,
+                    sensors: sensorsWithStatus,
+                    lastActionAt: lastAction?.timestamp || null   // ⭐ nouvelle clé
                 });
             }
 
@@ -59,6 +76,46 @@ const plantSensorsController = {
                 message: 'Error retrieving plant data with sensors'
             });
         }
+    },
+    //get signle plant with sensors
+    getPlantWithSensors: async (req, res) => {
+        const user_id = req.user.userId;
+        const plant_id = parseInt(req.params.plant_id);
+
+        if(isNaN(plant_id)) {
+            return res.status(400).json({ success: false, message: 'Invalid plant ID' });
+        }
+
+        try {
+            const plant = await Plant.getById(plant_id, user_id);
+            if (!plant) {
+                return res.status(404).json({ success: false, message: 'Plant not found or not authorized' });
+            }
+            const sensors = await Sensor.find({ plant_id });
+
+            const sensorsWithStatus = sensors.map(sensor => ({
+                type: sensor.sensor_type,
+                value: sensor.value,
+                status: getStatus(sensor.sensor_type, sensor.value),
+                timestamp: sensor.timestamp
+            }));
+
+            res.status(200).json({
+                success: true,
+                message: 'Sensors with status retrieved',
+                data: {
+                    ...plant,
+                    sensors: sensorsWithStatus
+                }
+            });
+        } catch (err)  {
+            console.error('[getPlantWithSensors Error]', err);
+            res.status(500).json({
+                success: false,
+                message: 'Error retrieving plant data with sensors'
+            });
+        }
+
     }
 };
 

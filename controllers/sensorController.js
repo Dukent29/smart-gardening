@@ -70,8 +70,6 @@ const SensorController = {
 
             if (!sensor) continue;
 
-            console.log(`[DEBUG] Type: ${type} | Value: ${sensor.value} | Timestamp: ${sensor.timestamp}`);
-
             const status = getStatus(type, sensor.value);
 
             processedSensors.push({
