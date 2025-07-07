@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const { authenticateJWT } = require('../middleware/auth');
 const sendEmail = require('../utils/sendEmail');
+const { validateRegister, validateLogin } = require("../middleware/validateUser");
 //add model user so resert-password can work
 
 
@@ -12,7 +13,7 @@ router.use((req, res, next) => {
 });
 
 // Register a new user
-router.post('/register', async (req, res, next) => {
+router.post('/register', validateRegister, async (req, res, next) => {
     try {
         await userController.register(req, res);
     } catch (error) {
@@ -20,7 +21,7 @@ router.post('/register', async (req, res, next) => {
     }
 });
 // Login a user
-router.post('/login', async (req, res, next) => {
+router.post('/login', validateLogin, async (req, res, next) => {
     try {
         await userController.login(req, res);
     } catch (error) {
