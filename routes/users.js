@@ -19,7 +19,6 @@ router.post('/register', async (req, res, next) => {
         next(error);
     }
 });
-
 // Login a user
 router.post('/login', async (req, res, next) => {
     try {
@@ -28,11 +27,12 @@ router.post('/login', async (req, res, next) => {
         next(error);
     }
 });
-
 // Confirm email using a route parameter
 router.get('/confirm/:token', userController.confirmEmail);
 router.put('/profile', authenticateJWT, userController.updateProfile);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
+// Get user information
+router.get('/profile', authenticateJWT, userController.getUserInfo);
 
 module.exports = router;

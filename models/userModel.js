@@ -72,7 +72,6 @@ const User = {
     }
     const query = 'SELECT * FROM users WHERE email = $1';
     const values = [email];
-    console.log('[DEBUG] Executing findByEmail query:', query, 'with values:', values);
     const result = await db.query(query, values);
     return result.rows[0]; // Access the first row
   },
