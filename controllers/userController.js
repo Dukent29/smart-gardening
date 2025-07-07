@@ -72,7 +72,7 @@ const confirmEmail = async (req, res) => {
   }
 };
 
-// Login a user
+// Log in a user
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -196,6 +196,32 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getUserInfo = async (req, res) => {
+  try {
+    const user_id = req.user?.userId;
+    if (!user_id) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.status(200).json({
+      success: true,
+      user: {
+        user_id: user.user_id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        created_at: user.created_at
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
 
 module.exports = {
   register,
@@ -203,5 +229,6 @@ module.exports = {
   login,
   updateProfile,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  getUserInfo
 };
