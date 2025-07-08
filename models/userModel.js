@@ -60,7 +60,7 @@ const User = {
     }
     const query = 'SELECT user_id, username, email, role, created_at FROM users WHERE user_id = $1';
     const values = [userId];
-    console.log('[DEBUG] Executing findById query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rows[0];
   },
@@ -141,7 +141,7 @@ const User = {
     }
     const query = 'SELECT * FROM users WHERE confirmation_token = $1';
     const values = [token];
-    console.log('[DEBUG] Executing findByToken query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rows[0]; // Access the first row
   },

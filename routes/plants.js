@@ -49,4 +49,6 @@ router.patch('/:plant_id/automation', authenticateJWT, async (req, res) => {
         });
     }
 });
+router.post('/identify', upload.single('image'), plantController.identifyPlant);
+router.post('/health', upload.single('image'), plantController.analyzePlantHealth);
 module.exports = router;

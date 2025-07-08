@@ -1,4 +1,6 @@
 const Plant = require('../models/plantModel');
+const axios = require('axios');
+const fs = require('fs');
 
 const PlantController = {
     createPlant: async (req, res) => {
@@ -102,7 +104,74 @@ const PlantController = {
             console.error('[ERROR] Update plant:', error.message);
             res.status(500).json({ success: false, message: error.message });
         }
+    },
+    identifyPlant: async (req, res) => {
+        try {
+            if (!req.file) {
+                return res.status(400).send({ success: false, error: 'No file uploaded' });
+            }
+
+            const base64Image = fs.readFileSync(req.file.path, 'base64');
+
+            const response = await axios.post('https://api.plant.id/v2/identify', {
+                images: [base64Image],
+                modifiers: ["similar_images"],
+                plant_details: ["common_names", "taxonomy", "wiki_description"]
+            }, {
+                headers: {
+                    "Api-Key": process.env.PLANT_ID_API_KEY
+                }
+            });
+
+            const s = response.data.suggestions?.[0] || {};
+            const name = s.plant_name || 'Unknown';
+            const taxonomy = s.plant_details?.taxonomy || {};
+            const type = taxonomy.class || 'Unknown';
+            const description = s.plant_details?.wiki_description?.value || 'No description';
+
+            const image_url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+            res.send({
+                success: true,
+                name,
+                type,
+                description,
+                image_url
+            });
+
+        } catch (err) {
+            console.error('[ERROR] Identify plant:', err.message);
+            res.status(500).send({ success: false, error: 'Error identifying plant' });
+        }
+    },
+    analyzePlantHealth: async (req, res) => {
+        try {
+            if (!req.file) {
+                return res.status(400).json({ success: false, error: 'No file uploaded' });
+            }
+
+            const base64Image = fs.readFileSync(req.file.path, 'base64');
+
+            const response = await axios.post('https://api.plant.id/v2/health_assessment', {
+                images: [base64Image],
+                similar_images: true
+            }, {
+                headers: {
+                    "Api-Key": process.env.PLANT_ID_API_KEY
+                }
+            });
+
+            res.status(200).json({
+                success: true,
+                health_data: response.data
+            });
+
+        } catch (error) {
+            console.error('[ERROR] Analyze plant health:', error.message);
+            res.status(500).json({ success: false, error: 'Error assessing plant health' });
+        }
     }
+
 };
 
 module.exports = PlantController;
