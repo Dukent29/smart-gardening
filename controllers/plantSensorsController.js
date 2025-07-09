@@ -87,7 +87,7 @@ const plantSensorsController = {
         }
 
         try {
-            const plant = await Plant.getById(plant_id, user_id);
+            const plant = await Plant.getById(plant_id, user_id, req);
             if (!plant) {
                 return res.status(404).json({ success: false, message: 'Plant not found or not authorized' });
             }

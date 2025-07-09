@@ -48,7 +48,7 @@ const SensorController = {
     const plant_id = parseInt(req.params.plant_id);
 
     try {
-        const plant = await Plant.getById(plant_id, user_id);
+        const plant = await Plant.getById(plant_id, user_id, req);
         if (!plant) {
             return res.status(403).json({
                 success: false,

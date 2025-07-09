@@ -12,10 +12,16 @@ const PlantController = {
             let imageUrl = null;
             if (req.file) {
                 // If a file is uploaded, store its path
-                imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+                imageUrl = `/uploads/${req.file.filename}`;
             } else if (req.body.imageUrl) {
-                // If a URL is provided, use it
-                imageUrl = req.body.imageUrl;
+                const fullUrl = req.body.imageUrl;
+                const uploadIndex = fullUrl.indexOf('/uploads/');
+                if (uploadIndex !== -1) {
+                    imageUrl = fullUrl.substring(uploadIndex);
+                } else {
+                    imageUrl = fullUrl; // Use the full URL if it doesn't contain '/uploads/'
+                }
+
             }
 
             // Validate required fields
@@ -48,7 +54,7 @@ const PlantController = {
         try {
             const { plant_id } = req.params;
             const user_id = req.user.userId;
-            const plant = await Plant.getById(plant_id, user_id);
+            const plant = await Plant.getById(plant_id, user_id, req);
             if (!plant) {
                 return res.status(404).json({ success: false, message: 'Plant not found' });
             }
@@ -62,7 +68,7 @@ const PlantController = {
         try {
             const { plant_id } = req.params;
             const user_id = req.user.userId;
-            const plant = await Plant.getById(plant_id, user_id);
+            const plant = await Plant.getById(plant_id, user_id, req);
             if (!plant) {
                 return res.status(404).json({ success: false, message: 'Plant not found' });
             }
@@ -112,6 +118,9 @@ const PlantController = {
             }
 
             const base64Image = fs.readFileSync(req.file.path, 'base64');
+            console.log('[DEBUG] File path:', req.file?.path);
+            console.log('[DEBUG] Reading file and encoding to base64...');
+
 
             const response = await axios.post('https://api.plant.id/v2/identify', {
                 images: [base64Image],
@@ -138,6 +147,7 @@ const PlantController = {
                 description,
                 image_url
             });
+            console.log('[DEBUG] Plant ID API response:', response.data);
 
         } catch (err) {
             console.error('[ERROR] Identify plant:', err.message);
