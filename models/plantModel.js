@@ -34,19 +34,26 @@ const Plant = {
 },
 
     // get single plant 
-    getById: async (plant_id, user_id) => {
-    if (!plant_id || !user_id) {
-        throw new Error('Invalid plantId or userId');
-    }
+    getById: async (plant_id, user_id, req) => {
+        if (!plant_id || !user_id) {
+            throw new Error('Invalid plantId or userId');
+        }
 
-    const query = `
-        SELECT plant_id, plant_name, plant_type, user_id, is_automatic, description, image_url
-        FROM plants
-        WHERE plant_id = $1 AND user_id = $2
-    `;
-    const values = [plant_id, user_id];
-    const result = await db.query(query, values);
-    return result.rows[0];
+        const query = `
+            SELECT plant_id, plant_name, plant_type, user_id, is_automatic, description, image_url
+            FROM plants
+            WHERE plant_id = $1 AND user_id = $2
+        `;
+        const values = [plant_id, user_id];
+        const result = await db.query(query, values);
+
+        const plant = result.rows[0];
+
+        if (plant && plant.image_url) {
+            plant.image_url = `${req.protocol}://${req.get('host')}${plant.image_url}`;
+        }
+
+        return plant;
     },
 
     updateAutomation: async (plant_id, is_automatic) => {

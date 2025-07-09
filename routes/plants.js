@@ -27,7 +27,7 @@ router.patch('/:plant_id/automation', authenticateJWT, async (req, res) => {
     }
 
     try {
-        const plant = await Plant.getById(plant_id, user_id);
+        const plant = await Plant.getById(plant_id, user_id, req);
         if (!plant) {
             return res.status(403).json({
                 success: false,
@@ -49,4 +49,6 @@ router.patch('/:plant_id/automation', authenticateJWT, async (req, res) => {
         });
     }
 });
+router.post('/identify', upload.single('image'), plantController.identifyPlant);
+router.post('/health', upload.single('image'), plantController.analyzePlantHealth);
 module.exports = router;
