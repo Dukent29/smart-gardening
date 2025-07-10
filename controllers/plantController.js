@@ -164,7 +164,8 @@ const PlantController = {
 
             const response = await axios.post('https://api.plant.id/v2/health_assessment', {
                 images: [base64Image],
-                similar_images: true
+                similar_images: true,
+                desease_details: true
             }, {
                 headers: {
                     "Api-Key": process.env.PLANT_ID_API_KEY
