@@ -12,7 +12,10 @@ const simulationRoutes = require('./routes/simulation')
 const simulateEffectRoutes = require('./routes/simulateEffect');
 //const simulateLoop = require('./services/simulateLoop'); // Import the simulation loop service
 const plantSensorsRoute = require('./routes/plantSensors');
+const plantChatRoutes = require('./routes/plantChat');
+
 const connectMongoDB = require('./config/mongo');
+
 
 dotenv.config();
 
@@ -34,6 +37,7 @@ app.use('/api/articles', articleRoutes);
 app.use('/api/simulate', simulateEffectRoutes);
 app.use('/api/simulation', simulationRoutes);
 app.use('/api', plantSensorsRoute);
+app.use('/api/chat', plantChatRoutes);
 
 
 
