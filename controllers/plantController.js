@@ -1,6 +1,7 @@
 const Plant = require('../models/plantModel');
 const axios = require('axios');
 const fs = require('fs');
+const notificationController = require('./notificationController'); // Assuming you have a notification controller for sending notifications
 
 const PlantController = {
     createPlant: async (req, res) => {
@@ -30,6 +31,13 @@ const PlantController = {
             }
 
             const plant = await Plant.create(name, type, description, user_id, imageUrl);
+            await notificationController.createNotification({
+                user_id,
+                type: 'plant',
+                title: 'New Plant Added',
+                message: `You have successfully added a new plant: ${name}.`,
+            });
+            console.log('Notification créée')
             res.status(201).json({
                 success: true,
                 message: 'Plant created successfully',
