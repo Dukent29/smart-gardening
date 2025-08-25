@@ -6,7 +6,12 @@ const Notification = require('../models/Notification');
 exports.list = async (req, res) => {
     const { user_id } = req.params;
     try {
-        const notifications = await Notification.find({ user_id });
+        const notifications = await Notification.find({
+            $or: [
+                { user_id: user_id },
+                { user_id: { $exists: false } }
+            ]
+        });
         res.json(notifications);
     } catch (err) {
         res.status(500).json({ error: 'Erreur lors de la récupération des notifications.' });

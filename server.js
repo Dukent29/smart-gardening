@@ -4,7 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const connectMongoDB = require('./config/mongo');
-//const simulateLoop = require('./services/simulateLoop')
+// const simulateLoop = require('./services/simulateLoop')
 
 dotenv.config();
 
@@ -35,6 +35,6 @@ app.get('/', (req, res) => {
 // Connect DB (tu peux aussi appeler dans index.js si tu veux + de contrôle)
 connectMongoDB();
 
-//simulateLoop();
+// simulateLoop();
 
 module.exports = app; // 🔥 On exporte `app` (sans listen)

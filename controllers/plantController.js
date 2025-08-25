@@ -33,6 +33,7 @@ const PlantController = {
             const plant = await Plant.create(name, type, description, user_id, imageUrl);
             await notificationController.createNotification({
                 user_id,
+                plant_id: plant._id || plant.id, // Ajout du champ plant_id
                 type: 'plant',
                 title: 'New Plant Added',
                 message: `You have successfully added a new plant: ${name}.`,
@@ -71,7 +72,7 @@ const PlantController = {
             console.error('[ERROR] Get plant by ID:', error.message);
             res.status(500).json({ success: false, message: error.message });
         }
-    },   
+    },
     deletePlant:async (req, res) => {
         try {
             const { plant_id } = req.params;
@@ -112,6 +113,14 @@ const PlantController = {
             if (!success) {
                 return res.status(404).json({ success: false, message: 'Plant not found or not authorized to update' });
             }
+            // notify user
+            await notificationController.createNotification({
+                user_id,
+                plant_id, // Ajout du champ plant_id
+                type: 'plant',
+                title: 'Plant Updated',
+                message: `You have successfully updated the plant: ${name}.`,
+            });
 
             res.status(200).json({ success: true, message: 'Plant updated successfully' });
         } catch (error) {
