@@ -82,6 +82,15 @@ const PlantController = {
                 return res.status(404).json({ success: false, message: 'Plant not found' });
             }
             await Plant.delete(plant_id, user_id);
+
+// Utilise l'id et le nom récupérés AVANT suppression
+            await notificationController.createNotification({
+                user_id,
+                plant_id, // id toujours disponible
+                type: 'plant',
+                title: 'Plant Deleted',
+                message: `You have successfully deleted the plant: ${plant.name}.`,
+            });
             res.status(200).json({ success: true, message: 'Plant deleted successfully' });
         } catch (error) {
             console.error('[ERROR] Delete plant:', error.message);
