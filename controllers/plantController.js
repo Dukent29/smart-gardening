@@ -1,6 +1,7 @@
 const Plant = require('../models/plantModel');
 const axios = require('axios');
 const fs = require('fs');
+const notificationController = require('./notificationController'); // Assuming you have a notification controller for sending notifications
 
 const PlantController = {
     createPlant: async (req, res) => {
@@ -30,6 +31,14 @@ const PlantController = {
             }
 
             const plant = await Plant.create(name, type, description, user_id, imageUrl);
+            await notificationController.createNotification({
+                user_id,
+                plant_id: plant._id || plant.id, // Ajout du champ plant_id
+                type: 'plant',
+                title: 'New Plant Added',
+                message: `You have successfully added a new plant: ${name}.`,
+            });
+            console.log('Notification créée')
             res.status(201).json({
                 success: true,
                 message: 'Plant created successfully',
@@ -63,7 +72,7 @@ const PlantController = {
             console.error('[ERROR] Get plant by ID:', error.message);
             res.status(500).json({ success: false, message: error.message });
         }
-    },   
+    },
     deletePlant:async (req, res) => {
         try {
             const { plant_id } = req.params;
@@ -73,6 +82,15 @@ const PlantController = {
                 return res.status(404).json({ success: false, message: 'Plant not found' });
             }
             await Plant.delete(plant_id, user_id);
+
+// Utilise l'id et le nom récupérés AVANT suppression
+            await notificationController.createNotification({
+                user_id,
+                plant_id, // id toujours disponible
+                type: 'plant',
+                title: 'Plant Deleted',
+                message: `You have successfully deleted the plant: ${plant.name}.`,
+            });
             res.status(200).json({ success: true, message: 'Plant deleted successfully' });
         } catch (error) {
             console.error('[ERROR] Delete plant:', error.message);
@@ -104,6 +122,14 @@ const PlantController = {
             if (!success) {
                 return res.status(404).json({ success: false, message: 'Plant not found or not authorized to update' });
             }
+            // notify user
+            await notificationController.createNotification({
+                user_id,
+                plant_id, // Ajout du champ plant_id
+                type: 'plant',
+                title: 'Plant Updated',
+                message: `You have successfully updated the plant: ${name}.`,
+            });
 
             res.status(200).json({ success: true, message: 'Plant updated successfully' });
         } catch (error) {

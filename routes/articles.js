@@ -7,6 +7,9 @@ const upload = require('../config/multer');
 //  GET — Lire tous les articles (filtrage optionnel par catégorie)
 router.get('/', articleController.getAllArticles);
 
+// GET — Lire un article par ID
+router.get('/:id', articleController.getArticleById);
+
 //  POST — Ajouter un nouvel article (auth requis)
 router.post('/', authenticateJWT, upload.single('image'), articleController.createArticle);
 

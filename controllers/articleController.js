@@ -1,4 +1,8 @@
 const Article = require('../models/articleModel');
+// configure notifications
+const { createNotification } = require('./notificationController');
+const notificationController = require("./notificationController");
+
 
 // get articles  list em by category
 exports.getAllArticles = async (req, res) => {
@@ -35,10 +39,7 @@ exports.getArticleById = async (req, res) => {
 exports.createArticle = async (req, res) => {
     try {
         const { title, content, category, author } = req.body;
-
-        const imageUrl = req.file
-            ? `/uploads/${req.file.filename}`
-            : null;
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
         const article = new Article({
             title,
@@ -50,26 +51,32 @@ exports.createArticle = async (req, res) => {
 
         await article.save();
 
+        // Notification globale (sans user_id)
+        await notificationController.createNotification({
+            type: 'info',
+            title: 'Nouvel article publié',
+            message: `Un nouvel article "${title}" a été publié.`,
+        });
+
         res.status(201).json({
             success: true,
-            message: 'Article created',
+            message: 'Article créé',
             article,
         });
     } catch (error) {
         console.error('[createArticle] ERROR:', error);
-        res.status(500).json({ success: false, message: 'Failed to create article' });
+        res.status(500).json({ success: false, message: 'Échec de la création de l\'article' });
     }
 };
 
 //delete article
 exports.deleteArticle = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Article.findByIdAndDelete(id);
-    res.status(200).json({ success: true, message: 'Article deleted' });
-  } catch (error) {
-    console.error('[DELETE /articles/:id] ERROR:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
+    try {
+        const { id } = req.params;
+        await Article.findByIdAndDelete(id);
+        res.status(200).json({ success: true, message: 'Article deleted' });
+    } catch (error) {
+        console.error('[DELETE /articles/:id] ERROR:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 };
-
