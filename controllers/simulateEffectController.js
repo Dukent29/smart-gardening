@@ -1,7 +1,8 @@
 // ✅ simulateEffectController.js
+const Plant = require('../models/plantModel');
 const Sensor = require('../models/sensorModel');
-const Action = require('../models/actionModel'); // ⬅️ Important pour enregistrer l'action
-const notificationController = require('./notificationController'); // ⬅️ Important pour les notifications
+const Action = require('../models/actionModel');
+const notificationController = require('./notificationController');
 
 const thresholds = {
     temperature: { low: 18, high: 30 },
@@ -13,9 +14,14 @@ const thresholds = {
 const simulateEffectController = {
     applyActionEffect: async (req, res) => {
         const plant_id = parseInt(req.params.plant_id);
+        const user_id = req.user?.userId;
 
         if (isNaN(plant_id)) {
             return res.status(400).json({ success: false, message: 'Invalid plant ID' });
+        }
+
+        if (!user_id) {
+            return res.status(400).json({ success: false, message: 'User ID is required for notifications' });
         }
 
         try {
@@ -73,7 +79,8 @@ const simulateEffectController = {
 
                     // Appeler le contrôleur de notification
                     await notificationController.createNotification({
-                        user_id: null, // ou spécifiez un user_id si nécessaire
+                        user_id,
+                        plant_id, // Ajout du champ plant_id pour plus de contexte
                         type: 'alert',
                         title: `Problème détecté avec ${sensor.sensor_type}`,
                         message: notificationMessage
