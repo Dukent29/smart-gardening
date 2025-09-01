@@ -25,7 +25,6 @@ app.use('/api/articles', require('./routes/articles'));
 app.use('/api/simulate', require('./routes/simulateEffect'));
 app.use('/api/simulation', require('./routes/simulation'));
 app.use('/api', require('./routes/plantSensors'));
-app.use('/api/chatbot', require('./routes/chatbot'));
 app.use('/api/notifications', require('./routes/notifications'));
 // Health Check
 app.get('/', (req, res) => {

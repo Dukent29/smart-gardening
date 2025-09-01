@@ -34,7 +34,7 @@ const PlantController = {
             await notificationController.createNotification({
                 user_id,
                 plant_id: plant._id || plant.id, // Ajout du champ plant_id
-                type: 'plant',
+                type: 'add_plant',
                 title: 'New Plant Added',
                 message: `You have successfully added a new plant: ${name}.`,
             });
@@ -87,8 +87,8 @@ const PlantController = {
             await notificationController.createNotification({
                 user_id,
                 plant_id, // id toujours disponible
-                type: 'plant',
-                title: 'Plant Deleted',
+                type: 'delete',
+                title: 'Deleted Plant',
                 message: `You have successfully deleted the plant: ${plant.name}.`,
             });
             res.status(200).json({ success: true, message: 'Plant deleted successfully' });
@@ -127,7 +127,7 @@ const PlantController = {
                 user_id,
                 plant_id, // Ajout du champ plant_id
                 type: 'plant',
-                title: 'Plant Updated',
+                title: 'update',
                 message: `You have successfully updated the plant: ${name}.`,
             });
 
@@ -206,6 +206,23 @@ const PlantController = {
         } catch (error) {
             console.error('[ERROR] Analyze plant health:', error.message);
             res.status(500).json({ success: false, error: 'Error assessing plant health' });
+        }
+    },
+    //get plant count for a user
+    getPlantCountByUser: async (req, res) => {
+        try {
+            const user_id = req.user.userId;
+
+            if (!user_id) {
+                return res.status(400).json({ success: false, message: 'Invalid userId' });
+            }
+
+            const count = await Plant.getPlantCountByUser(user_id);
+
+            res.status(200).json({ success: true, count });
+        } catch (error) {
+            console.error('[ERROR] Get plant count:', error.message);
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 

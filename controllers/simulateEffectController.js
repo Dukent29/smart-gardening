@@ -1,6 +1,7 @@
 // ✅ simulateEffectController.js
 const Sensor = require('../models/sensorModel');
 const Action = require('../models/actionModel'); // ⬅️ Important pour enregistrer l'action
+const notificationController = require('./notificationController'); // ⬅️ Important pour les notifications
 
 const thresholds = {
     temperature: { low: 18, high: 30 },
@@ -53,6 +54,32 @@ const simulateEffectController = {
                 }
 
                 if (actionNeeded) {
+                    // Construire le message de notification
+                    let notificationMessage = '';
+                    switch (sensor.sensor_type) {
+                        case 'soil_moisture':
+                            notificationMessage = 'Le niveau d\'humidité du sol est trop bas. Une irrigation manuelle est nécessaire.';
+                            break;
+                        case 'humidity':
+                            notificationMessage = 'Le niveau d\'humidité est trop bas. Un humidificateur manuel est nécessaire.';
+                            break;
+                        case 'light':
+                            notificationMessage = 'Le niveau de lumière est trop faible. Un éclairage manuel est nécessaire.';
+                            break;
+                        case 'temperature':
+                            notificationMessage = 'La température est trop basse. Un chauffage manuel est nécessaire.';
+                            break;
+                    }
+
+                    // Appeler le contrôleur de notification
+                    await notificationController.createNotification({
+                        user_id: null, // ou spécifiez un user_id si nécessaire
+                        type: 'alert',
+                        title: `Problème détecté avec ${sensor.sensor_type}`,
+                        message: notificationMessage
+                    });
+
+                    // Mettre à jour le capteur après notification
                     sensor.value = newValue;
                     sensor.timestamp = new Date();
                     await sensor.save();
