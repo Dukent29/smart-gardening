@@ -11,7 +11,8 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors("*"));
+const allowed = process.env.CORS_ORIGIN?.split(',') || ['*'];
+app.use(cors({ origin: allowed }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
