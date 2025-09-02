@@ -11,7 +11,8 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors("*"));
+const allowed = process.env.CORS_ORIGIN?.split(',') || ['*'];
+app.use(cors({ origin: allowed }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -25,7 +26,6 @@ app.use('/api/articles', require('./routes/articles'));
 app.use('/api/simulate', require('./routes/simulateEffect'));
 app.use('/api/simulation', require('./routes/simulation'));
 app.use('/api', require('./routes/plantSensors'));
-app.use('/api/chatbot', require('./routes/chatbot'));
 app.use('/api/notifications', require('./routes/notifications'));
 // Health Check
 app.get('/', (req, res) => {

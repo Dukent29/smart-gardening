@@ -1,6 +1,8 @@
 // ✅ simulateEffectController.js
+const Plant = require('../models/plantModel');
 const Sensor = require('../models/sensorModel');
-const Action = require('../models/actionModel'); // ⬅️ Important pour enregistrer l'action
+const Action = require('../models/actionModel');
+const notificationController = require('./notificationController');
 
 const thresholds = {
     temperature: { low: 18, high: 30 },
@@ -12,9 +14,14 @@ const thresholds = {
 const simulateEffectController = {
     applyActionEffect: async (req, res) => {
         const plant_id = parseInt(req.params.plant_id);
+        const user_id = req.user?.userId;
 
         if (isNaN(plant_id)) {
             return res.status(400).json({ success: false, message: 'Invalid plant ID' });
+        }
+
+        if (!user_id) {
+            return res.status(400).json({ success: false, message: 'User ID is required for notifications' });
         }
 
         try {
@@ -53,6 +60,33 @@ const simulateEffectController = {
                 }
 
                 if (actionNeeded) {
+                    // Construire le message de notification
+                    let notificationMessage = '';
+                    switch (sensor.sensor_type) {
+                        case 'soil_moisture':
+                            notificationMessage = 'Le niveau d\'humidité du sol est trop bas. Une irrigation manuelle est nécessaire.';
+                            break;
+                        case 'humidity':
+                            notificationMessage = 'Le niveau d\'humidité est trop bas. Un humidificateur manuel est nécessaire.';
+                            break;
+                        case 'light':
+                            notificationMessage = 'Le niveau de lumière est trop faible. Un éclairage manuel est nécessaire.';
+                            break;
+                        case 'temperature':
+                            notificationMessage = 'La température est trop basse. Un chauffage manuel est nécessaire.';
+                            break;
+                    }
+
+                    // Appeler le contrôleur de notification
+                    await notificationController.createNotification({
+                        user_id,
+                        plant_id, // Ajout du champ plant_id pour plus de contexte
+                        type: 'alert',
+                        title: `Problème détecté avec ${sensor.sensor_type}`,
+                        message: notificationMessage
+                    });
+
+                    // Mettre à jour le capteur après notification
                     sensor.value = newValue;
                     sensor.timestamp = new Date();
                     await sensor.save();
