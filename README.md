@@ -14,12 +14,19 @@
    ```bash
     npm install
     ```
-3. Importez la base de données :
-   - Ouvrez PostgreSQL et créez une nouvelle base de données nommée `smart_garden`.
-   - Importez le fichier `smart_garden.sql` situé dans le dossier `db` :
-     ```bash
-     psql -U your_username -d smart_gardening -f path/to/database.sql
-     ```
+   3. Importez la base de données :
+      - Ouvrez PostgreSQL et créez une nouvelle base de données nommée `smart_garden`.
+      - Importez le fichier `smart_garden.sql` situé dans le dossier `db` :
+        ```bash
+        psql -U your_username -d smart_gardening -f path/to/database.sql
+        ```
+        MongoDB
+      - Assurez-vous que MongoDB est en cours d'exécution sur votre machine.
+      - Importez la base de données MongoDB située dans` :
+        ```bash
+        db/smart_garden/ :
+         mongorestore --db smart_garden
+        ```
 4. lancer le serveur :
    ```bash
    node index.js
