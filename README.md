@@ -18,7 +18,7 @@
       - Ouvrez PostgreSQL et créez une nouvelle base de données nommée `smart_garden`.
       - Importez le fichier `smart_garden.sql` situé dans le dossier `db` :
         ```bash
-        psql -U your_username -d smart_gardening -f path/to/database.sql
+        psql -U postgres -d smart_gardening -f db/smart_garden.sql
         ```
         MongoDB
       - Assurez-vous que MongoDB est en cours d'exécution sur votre machine.
