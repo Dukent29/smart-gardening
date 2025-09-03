@@ -12,7 +12,7 @@ const app = express();
 
 // Middleware
 const allowed = process.env.CORS_ORIGIN?.split(',') || ['*'];
-app.use(cors({ origin: allowed }));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
