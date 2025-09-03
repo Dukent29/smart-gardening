@@ -99,19 +99,19 @@ const simulateEffectController = {
                     let actionText = '';
                     switch (sensor.sensor_type) {
                         case 'soil_moisture':
-                            actionText = '💧 Manual watering triggered';
+                            actionText = '💧 Arrosage manuel déclenché';
                             break;
                         case 'humidity':
-                            actionText = '💨 Manual humidifier activated';
+                            actionText = '💨 Humidificateur manuel activé';
                             break;
                         case 'light':
-                            actionText = '💡 Manual lighting activated';
+                            actionText = '💡 Éclairage manuel activé';
                             break;
                         case 'temperature':
-                            actionText = '🔥 Manual heating triggered';
+                            actionText = '🔥 Chauffage manuel déclenché';
                             break;
                         default:
-                            actionText = `Manual action on ${sensor.sensor_type}`;
+                            actionText = `Action manuelle sur ${sensor.sensor_type}`;
                     }
 
                     await Action.create({
