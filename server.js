@@ -17,6 +17,7 @@ app.use(cors({
     origin: [/\.vercel\.app$/, 'http://localhost:3000', ...allowed],
     credentials: true, // si tu utilises cookies/Authorization
 }));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
