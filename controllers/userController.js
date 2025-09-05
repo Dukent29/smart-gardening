@@ -156,11 +156,11 @@ const forgotPassword = async (req, res) => {
     // Send email
     await sendEmail({
       to: email,
-      subject: 'Password Reset Request',
-      text: `Hello ${user.username},\n\nClick the link to reset your password: ${resetUrl}\n\nIf you didn't request this, ignore this email.`,
+      subject: 'Demande de réinitialisation du mot de passe',
+      text: `Bonjour ${user.username},\n\nCliquez sur le lien suivant pour réinitialiser votre mot de passe : ${resetUrl}\n\nSi vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet e-mail.`,
     });
 
-    return res.json({ success: true, message: 'Password reset link sent to your email.' });
+    return res.json({ success: true, message: 'Le lien de réinitialisation du mot de passe a été envoyé à votre adresse e-mail.' });
   } catch (error) {
     console.error('[ERROR] Forgot Password:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -186,7 +186,7 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await User.updatePasswordByEmail(user.email, hashedPassword);
 
-    // Optionally, clear the token after reset
+  
     await User.clearResetToken(user.email);
 
     return res.json({ success: true, message: 'Password has been reset successfully' });
