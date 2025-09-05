@@ -17,19 +17,19 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api/users', require('./routes/users'));
-app.use('/api/plants', require('./routes/plants'));
-app.use('/api/sensors', require('./routes/sensors'));
-app.use('/api/actions', require('./routes/actions'));
-app.use('/api/mock', require('./routes/mock'));
-app.use('/api/articles', require('./routes/articles'));
-app.use('/api/simulate', require('./routes/simulateEffect'));
-app.use('/api/simulation', require('./routes/simulation'));
-app.use('/api', require('./routes/plantSensors'));
-app.use('/api/notifications', require('./routes/notifications'));
+app.use('/users', require('./routes/users'));
+app.use('/plants', require('./routes/plants'));
+app.use('/sensors', require('./routes/sensors'));
+app.use('/actions', require('./routes/actions'));
+app.use('/mock', require('./routes/mock'));
+app.use('/articles', require('./routes/articles'));
+app.use('/simulate', require('./routes/simulateEffect'));
+app.use('/simulation', require('./routes/simulation'));
+app.use('/plantSensors', require('./routes/plantSensors'));
+app.use('/notifications', require('./routes/notifications'));
 // Health Check
 app.get('/', (req, res) => {
     res.send('Smart Gardening Backend is running!');
