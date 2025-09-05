@@ -170,8 +170,6 @@ const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-     // You already confirmed this shows correct values
-
     if (!token || !newPassword) {
       return res.status(400).json({ success: false, message: 'Token and new password are required' });
     }
