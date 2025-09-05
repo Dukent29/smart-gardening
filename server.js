@@ -35,9 +35,9 @@ app.get('/', (req, res) => {
     res.send('Smart Gardening Backend is running!');
 });
 
-// Connect DB (tu peux aussi appeler dans index.js si tu veux + de contrôle)
+
 connectMongoDB();
 
 // simulateLoop();
 
-module.exports = app; // 🔥 On exporte `app` (sans listen)
+module.exports = app; 
