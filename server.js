@@ -14,8 +14,8 @@ const app = express();
 const allowed = process.env.CORS_ORIGIN?.split(',') || ['*'];
 // app.use(cors({ origin: allowed }));
 app.use(cors({
-    origin: [/\.vercel\.app$/, 'http://localhost:3000', ...allowed],
-    credentials: true, // si tu utilises cookies/Authorization
+    origin: ['https://smart-gardening-front.vercel.app', 'http://localhost:3000'], // Explicitly allow your frontend
+    credentials: true, // Allow cookies/Authorization headers
 }));
 
 app.use(express.json());
