@@ -1,20 +1,33 @@
+const Joi = require('joi');
 const Article = require('../models/articleModel');
 // configure notifications
 const { createNotification } = require('./notificationController');
 const notificationController = require("./notificationController");
 
+// Schéma de validation pour la création d'un article
+const articleSchema = Joi.object({
+    title: Joi.string().min(3).max(255).required(),
+    content: Joi.string().required(),
+    category: Joi.string().required(),
+    author: Joi.string().required(),
+});
 
-// get articles  list em by category
+// Schéma de validation pour l'ID d'un article
+const idSchema = Joi.object({
+    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+});
+
+// get articles list by category
 exports.getAllArticles = async (req, res) => {
     try {
         const { category } = req.query;
 
-        //id category isdefinedn filter if not display all
+        // id category is defined, filter if not display all
         const filter = category ? { category } : {};
         const articles = await Article.find(filter).sort({ createdAt: -1 });
 
         res.status(200).json({ success: true, articles });
-    } catch (error){
+    } catch (error) {
         console.error('[GET /articles] ERROR:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
@@ -23,6 +36,14 @@ exports.getAllArticles = async (req, res) => {
 // get article by id
 exports.getArticleById = async (req, res) => {
     try {
+        const { error } = idSchema.validate(req.params);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Validation error: ${error.details[0].message}`,
+            });
+        }
+
         const { id } = req.params;
         const article = await Article.findById(id);
         if (!article) {
@@ -35,9 +56,17 @@ exports.getArticleById = async (req, res) => {
     }
 };
 
-//create article
+// create article
 exports.createArticle = async (req, res) => {
     try {
+        const { error } = articleSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Validation error: ${error.details[0].message}`,
+            });
+        }
+
         const { title, content, category, author } = req.body;
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -69,9 +98,17 @@ exports.createArticle = async (req, res) => {
     }
 };
 
-//delete article
+// delete article
 exports.deleteArticle = async (req, res) => {
     try {
+        const { error } = idSchema.validate(req.params);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Validation error: ${error.details[0].message}`,
+            });
+        }
+
         const { id } = req.params;
         await Article.findByIdAndDelete(id);
         res.status(200).json({ success: true, message: 'Article deleted' });

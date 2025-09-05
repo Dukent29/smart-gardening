@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const Plant = require('../models/plantModel');
 const Sensor = require('../models/sensorModel');
 const Action = require('../models/actionModel');
@@ -17,7 +18,6 @@ function getStatus(type, value) {
     return 'OK';
 }
 
-// la fonction d’action
 function getActionText(sensor_type, status, value) {
     if (sensor_type === 'soil_moisture') {
         if (status === 'LOW') return ` Auto-watering triggered: soil moisture is LOW (${value}%)`;
@@ -44,73 +44,90 @@ function getActionText(sensor_type, status, value) {
 
 const SensorController = {
     simulateAndAutomate: async (req, res) => {
-    const user_id = req.user.userId;
-    const plant_id = parseInt(req.params.plant_id);
-
-    try {
-        const plant = await Plant.getById(plant_id, user_id, req);
-        if (!plant) {
-            return res.status(403).json({
-                success: false,
-                message: 'Access denied: Plant not found or not yours.'
-            });
-        }
-
-        const sensorTypes = await Sensor
-            .find({ plant_id })
-            .distinct('sensor_type');
-
-        const triggeredActions = [];
-        const processedSensors = [];
-
-        for (const type of sensorTypes) {
-            const sensor = await Sensor
-                .findOne({ plant_id, sensor_type: type })
-                .sort({ timestamp: -1 });
-
-            if (!sensor) continue;
-
-            const status = getStatus(type, sensor.value);
-
-            processedSensors.push({
-                type,
-                value: sensor.value,
-                status
-            });
-
-            //  S'il est automatique, on agit
-            if (status !== 'OK' && plant.is_automatic) {
-                const actionText = getActionText(type, status, sensor.value);
-
-                await Action.create({
-                    plant_id,
-                    sensor_type: type,
-                    value: sensor.value,
-                    status,
-                    action: actionText,
-                    action_type: 'auto',
-                    timestamp: new Date()
-                });
-
-                triggeredActions.push(actionText);
-            }
-        }
-
-        res.status(200).json({
-            success: true,
-            message: plant.is_automatic
-                ? 'Simulation & automation complete (AUTO mode)'
-                : 'Simulation complete (MANUAL mode – no actions triggered)',
-            sensors: processedSensors,
-            triggeredActions
+        // Schéma de validation
+        const schema = Joi.object({
+            plant_id: Joi.number().integer().required(),
+            userId: Joi.number().integer().required()
         });
 
-    } catch (error) {
-        console.error('[simulate] ERROR:', error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
+        // Validation des données
+        const { error } = schema.validate({
+            plant_id: parseInt(req.params.plant_id, 10),
+            userId: req.user.userId
+        });
 
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Validation error: ${error.details[0].message}`
+            });
+        }
+
+        const user_id = req.user.userId;
+        const plant_id = parseInt(req.params.plant_id, 10);
+
+        try {
+            const plant = await Plant.getById(plant_id, user_id, req);
+            if (!plant) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Access denied: Plant not found or not yours.'
+                });
+            }
+
+            const sensorTypes = await Sensor
+                .find({ plant_id })
+                .distinct('sensor_type');
+
+            const triggeredActions = [];
+            const processedSensors = [];
+
+            for (const type of sensorTypes) {
+                const sensor = await Sensor
+                    .findOne({ plant_id, sensor_type: type })
+                    .sort({ timestamp: -1 });
+
+                if (!sensor) continue;
+
+                const status = getStatus(type, sensor.value);
+
+                processedSensors.push({
+                    type,
+                    value: sensor.value,
+                    status
+                });
+
+                if (status !== 'OK' && plant.is_automatic) {
+                    const actionText = getActionText(type, status, sensor.value);
+
+                    await Action.create({
+                        plant_id,
+                        sensor_type: type,
+                        value: sensor.value,
+                        status,
+                        action: actionText,
+                        action_type: 'auto',
+                        timestamp: new Date()
+                    });
+
+                    triggeredActions.push(actionText);
+                }
+            }
+
+            res.status(200).json({
+                success: true,
+                message: plant.is_automatic
+                    ? 'Simulation & automation complete (AUTO mode)'
+                    : 'Simulation complete (MANUAL mode – no actions triggered)',
+                sensors: processedSensors,
+                triggeredActions
+            });
+
+        } catch (error) {
+            console.error('[simulate] ERROR:', error);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
 };
 
 module.exports = SensorController;
