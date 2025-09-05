@@ -50,21 +50,21 @@ const register = async (req, res) => {
 const confirmEmail = async (req, res) => {
   try {
     const { token } = req.params; // Use req.params to get the token
-    console.log('[DEBUG] Received token:', token);
+
 
     const user = await User.findByToken(token);
     if (!user) {
-      console.log('[DEBUG] Invalid or expired token:', token);
+
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
 
     const isActivated = await User.activateAccount(user.user_id);
     if (!isActivated) {
-      console.log('[DEBUG] Failed to activate account for user_id:', user.user_id);
+
       return res.status(500).json({ success: false, message: 'Failed to activate account' });
     }
 
-    console.log('[DEBUG] Account activated for user_id:', user.user_id);
+
     res.status(200).json({ success: true, message: 'Email confirmed. You can now log in.' });
   } catch (error) {
     console.error('[ERROR] Confirm email error:', error);
@@ -170,7 +170,7 @@ const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    console.log('[DEBUG] Request Body:', req.body); // You already confirmed this shows correct values
+     // You already confirmed this shows correct values
 
     if (!token || !newPassword) {
       return res.status(400).json({ success: false, message: 'Token and new password are required' });

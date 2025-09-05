@@ -8,7 +8,7 @@ const User = {
   // Fetch all users
   getAll: async () => {
     const query = 'SELECT user_id, username, email, role, created_at FROM users';
-    console.log('[DEBUG] Executing getAll query:', query);
+
     const result = await db.query(query);
     return result.rows; // Access the rows property
   },
@@ -19,7 +19,7 @@ const User = {
     WHERE email = $3
   `;
     const values = [token, expiry, email];
-    console.log('[DEBUG] Executing setResetToken query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rowCount > 0;
   },
@@ -72,7 +72,7 @@ const User = {
     }
     const query = 'SELECT * FROM users WHERE email = $1';
     const values = [email];
-    console.log('[DEBUG] Executing findByEmail query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rows[0]; // Access the first row
   },
@@ -84,7 +84,6 @@ const User = {
     }
     const query = 'SELECT user_id, username, email, is_active FROM users WHERE email = $1';
     const values = [email];
-    console.log('[DEBUG] Executing findActivationStatusByEmail query:', query, 'with values:', values);
     const result = await db.query(query, values);
     return result.rows[0]; // Access the first row
   },
@@ -101,8 +100,7 @@ const User = {
       RETURNING user_id
     `;
     const values = [username, email, hashedPassword, role, confirmationToken, false];
-    console.log('[DEBUG] Executing create query:', query, 'with values:', values);
-    const result = await db.query(query, values);
+
     return result.rows[0].user_id; // Access the user_id from the first row
   },
 
@@ -117,7 +115,7 @@ const User = {
       WHERE user_id = $2
     `;
     const values = [newRole, userId];
-    console.log('[DEBUG] Executing updateRole query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rowCount > 0; // Return true if the update was successful
   },
@@ -129,7 +127,7 @@ const User = {
     }
     const query = 'DELETE FROM users WHERE user_id = $1';
     const values = [userId];
-    console.log('[DEBUG] Executing delete query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rowCount > 0; // Return true if the deletion was successful
   },
@@ -157,7 +155,7 @@ const User = {
       WHERE user_id = $2
     `;
     const values = [true, userId];
-    console.log('[DEBUG] Executing activateAccount query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
     return result.rowCount > 0; // Return true if the update was successful
   },
@@ -174,7 +172,7 @@ const User = {
   `;
     const values = [username || null, email || null, userId];
 
-    console.log('[DEBUG] Executing update query:', query, 'with values:', values);
+
     const result = await db.query(query, values);
 
     if (result.rows.length === 0) {

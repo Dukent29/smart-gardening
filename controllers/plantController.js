@@ -144,8 +144,7 @@ const PlantController = {
             }
 
             const base64Image = fs.readFileSync(req.file.path, 'base64');
-            console.log('[DEBUG] File path:', req.file?.path);
-            console.log('[DEBUG] Reading file and encoding to base64...');
+
 
 
             const response = await axios.post('https://api.plant.id/v2/identify', {
@@ -173,7 +172,7 @@ const PlantController = {
                 description,
                 image_url
             });
-            console.log('[DEBUG] Plant ID API response:', response.data);
+
 
         } catch (err) {
             console.error('[ERROR] Identify plant:', err.message);
