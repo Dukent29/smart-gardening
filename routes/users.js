@@ -33,7 +33,6 @@ router.get('/confirm/:token', userController.confirmEmail);
 router.put('/profile', authenticateJWT, userController.updateProfile);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
-// Get user information
 router.get('/profile', authenticateJWT, userController.getUserInfo);
 
 module.exports = router;
