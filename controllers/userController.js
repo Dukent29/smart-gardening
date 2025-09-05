@@ -151,7 +151,7 @@ const forgotPassword = async (req, res) => {
     await User.setResetToken(email, resetToken, expiry);
 
     // Construct reset URL
-    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const resetUrl = `http://smart-gardening-front.vercel.app/reset-password?token=${resetToken}`;
 
     // Send email
     await sendEmail({
