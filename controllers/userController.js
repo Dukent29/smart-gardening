@@ -14,24 +14,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Register a new user
+
 const register = async (req, res) => {
   try {
     const { username, email, password, role = 'gardener' } = req.body; // Default role to 'gardener'
 
-    // Check if the user already exists
+    
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email is already registered' });
     }
 
-    // Generate a confirmation token
+    
     const confirmationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    // Create the new user
+    
     const newUser = await User.create(username, email, password, role, confirmationToken);
 
-    // Send confirmation email
+    
     const confirmationUrl = `http://localhost:5000/api/users/confirm/${confirmationToken}`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -46,12 +46,10 @@ const register = async (req, res) => {
   }
 };
 
-// Confirm email
+
 const confirmEmail = async (req, res) => {
   try {
-    const { token } = req.params; // Use req.params to get the token
-
-
+    const { token } = req.params; 
     const user = await User.findByToken(token);
     if (!user) {
 
@@ -77,24 +75,20 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find the user by email
     const user = await User.findByEmail(email);
     if (!user) {
       return res.status(404).json({ success: false, message: 'Invalid email or password' });
     }
 
-    // Check if the user's email is confirmed
     if (!user.is_active) {
       return res.status(403).json({ success: false, message: 'Please confirm your email before logging in.' });
     }
 
-    // Compare the provided password with the stored hash
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    // Generate a JWT token
     const token = jwt.sign(
       { userId: user.user_id, role: user.role },
       process.env.JWT_SECRET,
@@ -110,7 +104,7 @@ const login = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { username, email } = req.body;
-    const user_id = req.user?.userId;// Vérifiez si user_id est défini
+    const user_id = req.user?.userId;
 
     if (!user_id) {
       return res.status(400).json({ success: false, message: 'Invalid user_id' });
@@ -145,15 +139,15 @@ const forgotPassword = async (req, res) => {
 
     // Generate secure token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const expiry = new Date(Date.now() + 3600000); // 1 hour
+    const expiry = new Date(Date.now() + 3600000); 
 
-    // Store in DB
+    
     await User.setResetToken(email, resetToken, expiry);
 
-    // Construct reset URL
+    
     const resetUrl = `https://smart-gardening-front.vercel.app/reset-password?token=${resetToken}`;
 
-    // Send email
+    
     await sendEmail({
       to: email,
       subject: 'Demande de réinitialisation du mot de passe',

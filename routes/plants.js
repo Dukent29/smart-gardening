@@ -12,9 +12,9 @@ router.use(authenticateJWT);
 router.post('/add-plant', upload.single('image'), plantController.createPlant);
 router.get('/all', plantController.getAllPlants);
 router.get('/count', authenticateJWT, plantController.getPlantCountByUser);
-router.get('/:plant_id', plantController.getPlantById);// Get a single plant by ID
-router.delete('/:plant_id', plantController.deletePlant); // Delete a plant by ID
-router.put('/:plant_id', upload.single('image'), plantController.editPlant); // Update a plant by ID
+router.get('/:plant_id', plantController.getPlantById);
+router.delete('/:plant_id', plantController.deletePlant); 
+router.put('/:plant_id', upload.single('image'), plantController.editPlant); 
 router.patch('/:plant_id/automation', authenticateJWT, async (req, res) => {
     const user_id = req.user.userId;
     const plant_id = parseInt(req.params.plant_id);
