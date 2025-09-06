@@ -6,17 +6,17 @@ exports.authenticateJWT = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
-        return res.status(401).json({ success: false, message: 'Access denied. No Token provided' });
+        return res.status(401).json({ success: false, message: 'Accès refusé. Aucun jeton fourni' });
     }
 
     try {
         const decoded = JWT.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Add the userId and other info from token
-        //console.log('[DEBUG] Decoded JWT:', decoded);
+        req.user = decoded; 
+        
 
         next();
     } catch (error) {
-        //console.error('JWT verification error:', error);
-        res.status(401).json({ success: false, message: 'Invalid token' });
+        
+        res.status(401).json({ success: false, message: 'Jeton invalide' });
     }
 };
