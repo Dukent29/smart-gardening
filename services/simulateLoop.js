@@ -2,7 +2,7 @@ const Sensor = require('../models/sensorModel');
 const { generateMockSensors } = require('../models/sensorMock');
 const Plant = require('../models/plantModel');
 
-const INTERVAL_MS = 120 * 1000;
+const INTERVAL_MS = 48 * 60 * 60 * 1000;
 
  // Lance une boucle pour simuler les capteurs en temps réel.
 
