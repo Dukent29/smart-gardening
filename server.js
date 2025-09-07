@@ -4,7 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const connectMongoDB = require('./config/mongo');
-// const simulateLoop = require('./services/simulateLoop')
+const simulateLoop = require('./services/simulateLoop')
 
 dotenv.config();
 
@@ -38,6 +38,6 @@ app.get('/', (req, res) => {
 
 connectMongoDB();
 
-// simulateLoop();
+simulateLoop();
 
 module.exports = app; 
