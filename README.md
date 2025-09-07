@@ -32,3 +32,39 @@
    node index.js
    ```
 Accédez à l'api à l'adresse http://localhost:5000.
+
+# Structure du projet
+Le projet est structuré comme suit :
+
+projet-final-2/
+├── config/
+│   ├── mongo.js                # Configuration pour MongoDB
+│   ├── pg.js                   # Configuration pour PostgreSQL
+│   ├── multer.js               # Configuration pour le téléchargement de fichiers
+├── controllers/
+│   ├── articleController.js    # Contrôleur pour les articles
+│   ├── plantController.js      # Contrôleur pour les plantes
+│   ├── sensorController.js     # Contrôleur pour les capteurs
+│   ├── sensorMockController.js # Contrôleur pour les capteurs simulés
+│   ├── notificationController.js # Contrôleur pour les notifications
+├── middleware/
+│   ├── auth.js                 # Middleware pour l'authentification JWT
+│   ├── validateUser.js         # Middleware pour valider les données utilisateur
+├── models/
+│   ├── plantModel.js           # Modèle pour les plantes
+│   ├── sensorModel.js          # Modèle pour les capteurs
+│   ├── userModel.js            # Modèle pour les utilisateurs
+├── routes/
+│   ├── users.js                # Routes pour les utilisateurs
+│   ├── plants.js               # Routes pour les plantes
+│   ├── sensors.js              # Routes pour les capteurs
+│   ├── mock.js                 # Routes pour les données simulées
+│   ├── articles.js             # Routes pour les articles
+│   ├── notifications.js        # Routes pour les notifications
+├── services/
+│   ├── simulateLoop.js         # Service pour simuler des boucles automatiques
+│   ├── sendEmail.js            # Service pour envoyer des emails
+├── uploads/                    # Dossier pour les fichiers téléchargés (images, etc.)
+├── server.js                   # Point d'entrée principal du serveur
+├── package.json                # Dépendances et scripts du projet
+├── README.md                   # Documentation du projet

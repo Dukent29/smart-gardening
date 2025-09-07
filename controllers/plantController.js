@@ -1,18 +1,18 @@
 const Plant = require('../models/plantModel');
 const axios = require('axios');
 const fs = require('fs');
-const notificationController = require('./notificationController'); // Assuming you have a notification controller for sending notifications
+const notificationController = require('./notificationController');
 
 const PlantController = {
     createPlant: async (req, res) => {
         try {
-            const { name, type, description } = req.body; // Extract fields from the request body
-            const user_id = req.user.userId; // Extract user_id from the authenticated user (JWT)
+            const { name, type, description } = req.body;
+            const user_id = req.user.userId;
 
-            // Handle the image (file or URL)
+            
             let imageUrl = null;
             if (req.file) {
-                // If a file is uploaded, store its path
+                
                 imageUrl = `/uploads/${req.file.filename}`;
             } else if (req.body.imageUrl) {
                 const fullUrl = req.body.imageUrl;
@@ -20,12 +20,12 @@ const PlantController = {
                 if (uploadIndex !== -1) {
                     imageUrl = fullUrl.substring(uploadIndex);
                 } else {
-                    imageUrl = fullUrl; // Use the full URL if it doesn't contain '/uploads/'
+                    imageUrl = fullUrl; 
                 }
 
             }
 
-            // Validate required fields
+            
             if (!name || !type || !description || !user_id) {
                 return res.status(400).json({ success: false, message: 'Missing required fields' });
             }
@@ -33,7 +33,7 @@ const PlantController = {
             const plant = await Plant.create(name, type, description, user_id, imageUrl);
             await notificationController.createNotification({
                 user_id,
-                plant_id: plant._id || plant.id, // Ajout du champ plant_id
+                plant_id: plant._id || plant.id,
                 type: 'add_plant',
                 title: 'New Plant Added',
                 message: `You have successfully added a new plant: ${name}.`,
