@@ -32,7 +32,7 @@ const register = async (req, res) => {
     const newUser = await User.create(username, email, password, role, confirmationToken);
 
     
-    const confirmationUrl = `http://localhost:5000/api/users/confirm/${confirmationToken}`;
+    const confirmationUrl = `https://awm.portfolio-etudiant-rouen.com/api/api/users/confirm/${confirmationToken}`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -81,7 +81,7 @@ const login = async (req, res) => {
     }
 
     if (!user.is_active) {
-      return res.status(403).json({ success: false, message: 'Please confirm your email before logging in.' });
+      return res.status(403).json({ success: false, message: 'Veuillez confirmer votre adresse e-mail avant de vous connecter.' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
