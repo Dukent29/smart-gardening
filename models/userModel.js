@@ -93,15 +93,16 @@ const User = {
     if (!username || !email || !password || !role || !confirmationToken) {
       throw new Error('Missing required fields');
     }
-    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash du mot de passe
     const query = `
-      INSERT INTO users (username, email, password_hash, role, confirmation_token, is_active)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING user_id
-    `;
+    INSERT INTO users (username, email, password_hash, role, confirmation_token, is_active)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING user_id
+  `;
     const values = [username, email, hashedPassword, role, confirmationToken, false];
 
-    return result.rows[0].user_id; // Access the user_id from the first row
+    const result = await db.query(query, values); // Exécute la requête
+    return result.rows[0].user_id; // Retourne l'ID de l'utilisateur
   },
 
   // Update a user's role
