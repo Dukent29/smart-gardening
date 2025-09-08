@@ -37,10 +37,10 @@ const register = async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Confirm Your Email',
-      html: `<p>Please confirm your email by clicking <a href="${confirmationUrl}">here</a>.</p>`,
+      html: `<p>Veuillez confirmer votre adresse e-mail en cliquant <a href="${confirmationUrl}">ici</a>.</p>`,
     });
 
-    res.status(201).json({ success: true, message: 'User registered. Please check your email to confirm your account.' });
+    res.status(201).json({ success: true, message: 'Utilisateur enregistré. Veuillez vérifier votre e-mail pour confirmer votre compte.' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -53,17 +53,17 @@ const confirmEmail = async (req, res) => {
     const user = await User.findByToken(token);
     if (!user) {
 
-      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
+      return res.status(400).json({ success: false, message: 'Jeton invalide ou expiré' });
     }
 
     const isActivated = await User.activateAccount(user.user_id);
     if (!isActivated) {
 
-      return res.status(500).json({ success: false, message: 'Failed to activate account' });
+      return res.status(500).json({ success: false, message: 'Échec de l\'activation du compte' });
     }
 
 
-    res.status(200).json({ success: true, message: 'Email confirmed. You can now log in.' });
+    res.status(200).json({ success: true, message: 'E-mail confirmé. Vous pouvez maintenant vous connecter.' });
   } catch (error) {
     console.error('[ERROR] Confirm email error:', error);
     res.status(500).json({ success: false, message: error.message });
@@ -77,7 +77,7 @@ const login = async (req, res) => {
 
     const user = await User.findByEmail(email);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'Invalid email or password' });
+      return res.status(404).json({ success: false, message: 'E-mail ou mot de passe invalide' });
     }
 
     if (!user.is_active) {
@@ -86,7 +86,7 @@ const login = async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res.status(401).json({ success: false, message: 'E-mail ou mot de passe invalide' });
     }
 
     const token = jwt.sign(
