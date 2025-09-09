@@ -36,7 +36,7 @@ const register = async (req, res) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Confirm Your Email',
+      subject: 'Confirmez votre e-mail',
       html: `<p>Veuillez confirmer votre adresse e-mail en cliquant <a href="${confirmationUrl}">ici</a>.</p>`,
     });
 

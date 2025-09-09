@@ -140,7 +140,7 @@ const PlantController = {
     identifyPlant: async (req, res) => {
         try {
             if (!req.file) {
-                return res.status(400).send({ success: false, error: 'No file uploaded' });
+                return res.status(400).send({ success: false, error: 'Aucun fichier téléchargé' });
             }
 
             const base64Image = fs.readFileSync(req.file.path, 'base64');
